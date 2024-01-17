@@ -2,7 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+
+/* LessonProgressCard component style */
+.circular-progress {
+  position: relative;
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circular-progress::before {
+  content: "";
+  position: absolute;
+  height: 120px;
+  width: 120px;
+  border-radius: 50%;
+  background-color: #64748B;
+}
+
+.progress-value {
+  position: relative;
+  font-size: 30px;
+  font-weight: 600;
+  color: #F1F5F9;
+}
+
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -24,4 +52,4 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-}
+} */
