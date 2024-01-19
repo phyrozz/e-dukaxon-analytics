@@ -10,6 +10,9 @@ import LessonProgressCard from "./LessonProgressCard"
 import { Button, Menu, MenuItem } from "@mui/material"
 import Image from "next/image"
 import TopLessonsCard from "./TopLessonsCard"
+import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
+import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
+
 
 function Page() {
 	const { user } = useAuthContext()
@@ -22,15 +25,19 @@ function Page() {
 	const [wordProgress, setWordProgress] = useState(0)
 	const [isParent, setIsParent] = useState(false)
 	const [isEnglish, setIsEnglish] = useState(true)
+	const [isTopLessonsListDescending, setIsTopLessonsListDescending] = useState(true)
+	const [isTopPlayedLessonsListDescending, setIsTopPlayedLessonsListDescending] = useState(true)
+	const [topLessons, setTopLessons] = useState([])
+	const [topPlayedLessons, setTopPlayedLessons] = useState([])
 
-	const localeSelectOpen = Boolean(localeSelectAnchorEl);
+	const localeSelectOpen = Boolean(localeSelectAnchorEl)
 
 	const handleLocaleSelectClick = (event) => {
-    setlocaleSelectAnchorEl(event.currentTarget);
-  };
-  const handleLocaleSelectClose = () => {
-    setlocaleSelectAnchorEl(null);
-  };
+		setlocaleSelectAnchorEl(event.currentTarget)
+	};
+	const handleLocaleSelectClose = () => {
+		setlocaleSelectAnchorEl(null)
+	};
 
 	React.useEffect(() => {
 		if (user == null) router.push("/")
@@ -65,25 +72,127 @@ function Page() {
 				let totalLessonCount = lessonsSnapshot.size * 100
 
         lessonsSnapshot.forEach((lessonDoc) => {
-          const lessonData = lessonDoc.data();
+          const lessonData = lessonDoc.data()
           if (lessonData && lessonData.progress) {
-            totalProgress += lessonData.progress;
+            totalProgress += lessonData.progress
           }
-        });
+        })
 
-        const average = (totalProgress / totalLessonCount) * 100;
-        setProgress(average);
+        const average = (totalProgress / totalLessonCount) * 100
+        setProgress(average)
       } catch (error) {
-        console.error("Error fetching lesson progress:", error);
+        console.error("Error fetching lesson progress:", error)
       }
     }
 
+		const getTopandTopPlayedLessons = async () => {
+      try {
+        const userId = auth.currentUser.uid;
+        const letterLessonsSnapshot = await db
+          .collection("users")
+          .doc(userId)
+          .collection("letters")
+          .doc(isEnglish ? "en" : "ph")
+          .collection("lessons")
+          .get();
+				const numberLessonsSnapshot = await db
+          .collection("users")
+          .doc(userId)
+          .collection("words")
+          .doc(isEnglish ? "en" : "ph")
+          .collection("lessons")
+          .get();
+				const wordLessonsSnapshot = await db
+          .collection("users")
+          .doc(userId)
+          .collection("numbers")
+          .doc(isEnglish ? "en" : "ph")
+          .collection("lessons")
+          .get();
+				// Add more snapshots for new lesson types
+
+        const topLessonsData = []
+				const topPlayedLessonsData = []
+
+        letterLessonsSnapshot.forEach((lessonDoc) => {
+          const lessonData = lessonDoc.data()
+          if (lessonData) {
+            const accuracy =
+              (lessonData.accumulatedScore /
+                (lessonData.lessonTaken * lessonData.total)) *
+              100
+						topLessonsData.push({
+							lessonName: lessonData.name,
+							accuracy: isNaN(accuracy) ? 0 : accuracy,
+						})
+						topPlayedLessonsData.push({
+							lessonName: lessonData.name,
+							lessonTaken: lessonData.lessonTaken,
+						})
+          }
+        })
+				numberLessonsSnapshot.forEach((lessonDoc) => {
+          const lessonData = lessonDoc.data()
+          if (lessonData) {
+            const accuracy =
+              (lessonData.accumulatedScore /
+                (lessonData.lessonTaken * lessonData.total)) *
+              100
+						topLessonsData.push({
+							lessonName: lessonData.name,
+							accuracy: isNaN(accuracy) ? 0 : accuracy,
+						})
+						topPlayedLessonsData.push({
+							lessonName: lessonData.name,
+							lessonTaken: lessonData.lessonTaken,
+						})
+          }
+        })
+				wordLessonsSnapshot.forEach((lessonDoc) => {
+          const lessonData = lessonDoc.data()
+          if (lessonData) {
+            const accuracy =
+              (lessonData.accumulatedScore /
+                (lessonData.lessonTaken * lessonData.total)) *
+              100
+						topLessonsData.push({
+							lessonName: lessonData.name,
+							accuracy: isNaN(accuracy) ? 0 : accuracy,
+						})
+						topPlayedLessonsData.push({
+							lessonName: lessonData.name,
+							lessonTaken: lessonData.lessonTaken,
+						})
+          }
+        })
+				// Add more forEach on new lesson types
+
+        // Sort lessonsData array by accuracy
+        const sortedTopLessons = topLessonsData.sort(
+          (a, b) =>
+            (isTopLessonsListDescending ? b.accuracy - a.accuracy : a.accuracy - b.accuracy)
+        )
+				const sortedTopPlayedLessons = topPlayedLessonsData.sort(
+          (a, b) =>
+            (isTopPlayedLessonsListDescending ? b.lessonTaken - a.lessonTaken : a.lessonTaken - b.lessonTaken)
+        )
+
+				console.log(sortedTopPlayedLessons)
+
+        setTopLessons(sortedTopLessons)
+				setTopPlayedLessons(sortedTopPlayedLessons)
+      } catch (error) {
+        console.error("Error fetching top lessons:", error)
+      }
+    };
+
 		getUserData()
+		getTopandTopPlayedLessons()
 		getProgress(setLetterProgress, isEnglish ? "en" : "ph", "letters")
 		getProgress(setNumberProgress, isEnglish ? "en" : "ph", "numbers")
 		getProgress(setWordProgress, isEnglish ? "en" : "ph", "words")
 		// Add more getProgress for new lesson types
-	}, [isEnglish, router, user])
+	}, [isEnglish, isTopLessonsListDescending, isTopPlayedLessonsListDescending, router, user])
 
 	return (
 		<>
@@ -135,35 +244,61 @@ function Page() {
 				<div className="m-5 mt-10 flex flex-col gap-3 items-stretch">
 					<div className="flex flex-row justify-between">
 						<h2 className="text-xl">{isParent ? "Your Child's Top Lessons" : "Your Top Lessons"}</h2>
+						<Button 
+							id="top-lessons-sort"
+							onClick={() => {
+								if (isTopLessonsListDescending) {
+									setIsTopLessonsListDescending(false)
+								} else {
+									setIsTopLessonsListDescending(true)
+								}
+							}}
+							endIcon={isTopLessonsListDescending ? <ArrowDownwardRoundedIcon /> : <ArrowUpwardRoundedIcon />}
+						>
+							{isTopLessonsListDescending ? "Descending" : "Ascending"}
+						</Button>
 					</div>
 					<div className="flex flex-col gap-3">
-						<TopLessonsCard lessonName="Aa" accuracy={100} rank={1}/>
-						<TopLessonsCard lessonName="Mga Hayop" accuracy={100} rank={2}/>
-						<TopLessonsCard lessonName="Dd" accuracy={99} rank={3}/>
-						<TopLessonsCard lessonName="Mm" accuracy={93} rank={4}/>
-						<TopLessonsCard lessonName="2" accuracy={93} rank={5}/>
-						<TopLessonsCard lessonName="Gg" accuracy={90} rank={6}/>
-						<TopLessonsCard lessonName="Ww" accuracy={89} rank={7}/>
-						<TopLessonsCard lessonName="-ng" accuracy={87} rank={8}/>
-						<TopLessonsCard lessonName="Mga" accuracy={85} rank={9}/>
-						<TopLessonsCard lessonName="Bb" accuracy={85} rank={10}/>
+					{topLessons.slice(0, 10).map((lesson, index) => (
+						<TopLessonsCard
+							key={index}
+							lessonName={lesson.lessonName}
+							hasSubtext={true}
+							subtext="Accuracy"
+							value={Math.round(lesson.accuracy * 100)/100 + "%"}
+							rank={index + 1}
+						/>
+					))}
 					</div>
 				</div>
 				<div className="m-5 mt-10 flex flex-col gap-3 items-stretch">
 					<div className="flex flex-row justify-between">
-						<h2 className="text-xl">{isParent ? "Your Child's Top Lessons" : "Your Top Lessons"}</h2>
+						<h2 className="text-xl">{isParent ? "Your Child's Top Played Lessons" : "Your Top Played Lessons"}</h2>
+						<Button 
+							id="top-played-lessons-sort"
+							onClick={() => {
+								if (isTopPlayedLessonsListDescending) {
+									setIsTopPlayedLessonsListDescending(false)
+								} else {
+									setIsTopPlayedLessonsListDescending(true)
+								}
+							}}
+							endIcon={isTopPlayedLessonsListDescending ? <ArrowDownwardRoundedIcon /> : <ArrowUpwardRoundedIcon />}
+						>
+							{isTopPlayedLessonsListDescending ? "Descending" : "Ascending"}
+						</Button>
 					</div>
 					<div className="flex flex-col gap-3">
-						<TopLessonsCard lessonName="Aa" accuracy={100} rank={1}/>
-						<TopLessonsCard lessonName="Mga Hayop" accuracy={100} rank={2}/>
-						<TopLessonsCard lessonName="Dd" accuracy={99} rank={3}/>
-						<TopLessonsCard lessonName="Mm" accuracy={93} rank={4}/>
-						<TopLessonsCard lessonName="2" accuracy={93} rank={5}/>
-						<TopLessonsCard lessonName="Gg" accuracy={90} rank={6}/>
-						<TopLessonsCard lessonName="Ww" accuracy={89} rank={7}/>
-						<TopLessonsCard lessonName="-ng" accuracy={87} rank={8}/>
-						<TopLessonsCard lessonName="Mga" accuracy={85} rank={9}/>
-						<TopLessonsCard lessonName="Bb" accuracy={85} rank={10}/>
+						{topPlayedLessons.slice(0, 10).map((lesson, index) => (
+							<TopLessonsCard
+								key={index}
+								lessonName={lesson.lessonName}
+								hasSubtext={true}
+								subtext="Times taken"
+								value={lesson.lessonTaken}
+								rank={index + 1}
+							/>
+						))}
 					</div>
 				</div>
 			</div>

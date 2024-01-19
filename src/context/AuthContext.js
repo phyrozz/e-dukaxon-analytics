@@ -4,6 +4,7 @@ import {
     getAuth,
 } from 'firebase/auth';
 import { firebase_app } from '@/firebase/config';
+import { CircularProgress } from '@mui/material';
 
 const auth = getAuth(firebase_app);
 
@@ -32,7 +33,7 @@ export const AuthContextProvider = ({
 
     return (
         <AuthContext.Provider value={{ user }}>
-            {loading ? <div className='h-screen w-screen flex items-center justify-center'>Loading...</div> : children}
+            {loading ? <div className='h-screen w-screen flex justify-center items-center'><CircularProgress /></div> : children}
         </AuthContext.Provider>
     );
 };
