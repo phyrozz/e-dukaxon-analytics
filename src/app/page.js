@@ -1,5 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
+import { Button } from "@mui/material";
+import { ArrowForwardRounded } from "@mui/icons-material";
 
 export default function Home() {
   const router = useRouter()
@@ -11,9 +13,11 @@ export default function Home() {
         <h1 className="text-5xl pb-2">eDukaxon</h1>
         <p className="text-xl">For Parents</p>
       </div>
-      <p className="pt-4 font-bold pb-2">Get started by creating an account</p>
-      <button type="button" className="border border-slate-700 hover:bg-slate-700 hover:text-slate-50 px-6 py-1 transition rounded-md" onClick={() => router.push('/signup')}>Sign up</button>
-      <p className="absolute bottom-0 left-0 m-3">Already have an account? <a className="hover:font-bold transition-all underline underline-offset-2" href="#" onClick={() => router.push('/signin')}>Sign in</a></p>
+      <p className="pt-4 font-bold pb-2">Get started by signing in</p>
+      <Button variant="outlined" onClick={() => router.push('/signin')}>
+        <ArrowForwardRounded />
+      </Button>
+      <p className="absolute bottom-0 left-0 m-3">Are you an admin? <a className="hover:font-bold transition-all underline underline-offset-2" href="#" onClick={() => router.push('/signin')}>Sign in here</a></p>
     </div>
     </>
   )
