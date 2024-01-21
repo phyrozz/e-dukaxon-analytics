@@ -32,7 +32,7 @@ const Navbar = (props) => {
       <Toolbar>
         <div className="flex flex-grow">
           <h1 className="text-xl font-extralight mr-3">eDukaxon</h1>
-          <Button variant="text" color="inherit" onClick={() => router.push("/admin")}>Dashboard</Button>
+          <Button variant="text" color="inherit" onClick={() => router.push("/home")}>Dashboard</Button>
           <Button variant="text" color="inherit" onClick={() => router.push("/lessons")}>Lessons</Button>
         </div>
         <IconButton

@@ -17,7 +17,7 @@ export default function Home() {
       <Button variant="outlined" onClick={() => router.push('/signin')}>
         <ArrowForwardRounded />
       </Button>
-      <p className="absolute bottom-0 left-0 m-3">Are you an admin? <a className="hover:font-bold transition-all underline underline-offset-2" href="#" onClick={() => router.push('/signin')}>Sign in here</a></p>
+      <p className="absolute bottom-0 left-0 m-3">Are you an admin? <a className="hover:font-bold transition-all underline underline-offset-2" href="#" onClick={() => router.push('/signin/admin')}>Sign in here</a></p>
     </div>
     </>
   )

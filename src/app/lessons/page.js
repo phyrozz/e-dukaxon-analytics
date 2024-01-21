@@ -31,7 +31,7 @@ function Page() {
 		}
 
 		getUserData()
-	}, [user])
+	}, [router, user])
 
 	return (
 		<>
