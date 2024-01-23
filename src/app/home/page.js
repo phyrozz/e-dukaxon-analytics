@@ -43,149 +43,149 @@ function Page() {
 	};
 
 	React.useEffect(() => {
-		if (user == null) router.push("/")
+		if (user == null || user.role === "admin") router.push("/")
 
 		const getUserData = async () => {
-      try {
-        const userId = auth.currentUser.uid
-        const doc = await db.collection('users').doc(userId).get()
+			try {
+				const userId = auth.currentUser.uid
+				const doc = await db.collection('users').doc(userId).get()
 
-        if (doc.exists) {
-          const userData = doc.data()
-          setEmail(userData?.email || '')
-					setIsParent(userData?.isParent || false)
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error)
-      }
-    }
+				if (doc.exists) {
+				const userData = doc.data()
+				setEmail(userData?.email || '')
+							setIsParent(userData?.isParent || false)
+				}
+			} catch (error) {
+				console.error('Error fetching user data:', error)
+			}
+		}
 
 		const getProgress = async (setProgress, locale, lessonType) => {
-      try {
-        const userId = auth.currentUser.uid;
-        const lessonsSnapshot = await db
-          .collection("users")
-          .doc(userId)
-          .collection(lessonType)
-          .doc(locale)
-          .collection("lessons")
-          .get();
+			try {
+				const userId = auth.currentUser.uid;
+				const lessonsSnapshot = await db
+				.collection("users")
+				.doc(userId)
+				.collection(lessonType)
+				.doc(locale)
+				.collection("lessons")
+				.get();
 
-        let totalProgress = 0
-				let totalLessonCount = lessonsSnapshot.size * 100
+				let totalProgress = 0
+						let totalLessonCount = lessonsSnapshot.size * 100
 
-        lessonsSnapshot.forEach((lessonDoc) => {
-          const lessonData = lessonDoc.data()
-          if (lessonData && lessonData.progress) {
-            totalProgress += lessonData.progress
-          }
-        })
+				lessonsSnapshot.forEach((lessonDoc) => {
+				const lessonData = lessonDoc.data()
+				if (lessonData && lessonData.progress) {
+					totalProgress += lessonData.progress
+				}
+				})
 
-        const average = (totalProgress / totalLessonCount) * 100
-        setProgress(average)
-      } catch (error) {
-        console.error("Error fetching lesson progress:", error)
-      }
-    }
+				const average = (totalProgress / totalLessonCount) * 100
+				setProgress(average)
+			} catch (error) {
+				console.error("Error fetching lesson progress:", error)
+			}
+		}
 
 		const getTopandTopPlayedLessons = async () => {
-      try {
-        const userId = auth.currentUser.uid;
-        const letterLessonsSnapshot = await db
-          .collection("users")
-          .doc(userId)
-          .collection("letters")
-          .doc(isEnglish ? "en" : "ph")
-          .collection("lessons")
-          .get();
-				const numberLessonsSnapshot = await db
-          .collection("users")
-          .doc(userId)
-          .collection("words")
-          .doc(isEnglish ? "en" : "ph")
-          .collection("lessons")
-          .get();
-				const wordLessonsSnapshot = await db
-          .collection("users")
-          .doc(userId)
-          .collection("numbers")
-          .doc(isEnglish ? "en" : "ph")
-          .collection("lessons")
-          .get();
-				// Add more snapshots for new lesson types
+			try {
+				const userId = auth.currentUser.uid;
+				const letterLessonsSnapshot = await db
+				.collection("users")
+				.doc(userId)
+				.collection("letters")
+				.doc(isEnglish ? "en" : "ph")
+				.collection("lessons")
+				.get();
+						const numberLessonsSnapshot = await db
+				.collection("users")
+				.doc(userId)
+				.collection("words")
+				.doc(isEnglish ? "en" : "ph")
+				.collection("lessons")
+				.get();
+						const wordLessonsSnapshot = await db
+				.collection("users")
+				.doc(userId)
+				.collection("numbers")
+				.doc(isEnglish ? "en" : "ph")
+				.collection("lessons")
+				.get();
+						// Add more snapshots for new lesson types
 
-        const topLessonsData = []
-				const topPlayedLessonsData = []
+				const topLessonsData = []
+						const topPlayedLessonsData = []
 
-        letterLessonsSnapshot.forEach((lessonDoc) => {
-          const lessonData = lessonDoc.data()
-          if (lessonData) {
-            const accuracy =
-              (lessonData.accumulatedScore /
-                (lessonData.lessonTaken * lessonData.total)) *
-              100
-						topLessonsData.push({
-							lessonName: lessonData.name,
-							accuracy: isNaN(accuracy) ? 0 : accuracy,
-						})
-						topPlayedLessonsData.push({
-							lessonName: lessonData.name,
-							lessonTaken: lessonData.lessonTaken,
-						})
-          }
-        })
-				numberLessonsSnapshot.forEach((lessonDoc) => {
-          const lessonData = lessonDoc.data()
-          if (lessonData) {
-            const accuracy =
-              (lessonData.accumulatedScore /
-                (lessonData.lessonTaken * lessonData.total)) *
-              100
-						topLessonsData.push({
-							lessonName: lessonData.name,
-							accuracy: isNaN(accuracy) ? 0 : accuracy,
-						})
-						topPlayedLessonsData.push({
-							lessonName: lessonData.name,
-							lessonTaken: lessonData.lessonTaken,
-						})
-          }
-        })
-				wordLessonsSnapshot.forEach((lessonDoc) => {
-          const lessonData = lessonDoc.data()
-          if (lessonData) {
-            const accuracy =
-              (lessonData.accumulatedScore /
-                (lessonData.lessonTaken * lessonData.total)) *
-              100
-						topLessonsData.push({
-							lessonName: lessonData.name,
-							accuracy: isNaN(accuracy) ? 0 : accuracy,
-						})
-						topPlayedLessonsData.push({
-							lessonName: lessonData.name,
-							lessonTaken: lessonData.lessonTaken,
-						})
-          }
-        })
-				// Add more forEach on new lesson types
+				letterLessonsSnapshot.forEach((lessonDoc) => {
+				const lessonData = lessonDoc.data()
+				if (lessonData) {
+					const accuracy =
+					(lessonData.accumulatedScore /
+						(lessonData.lessonTaken * lessonData.total)) *
+					100
+								topLessonsData.push({
+									lessonName: lessonData.name,
+									accuracy: isNaN(accuracy) ? 0 : accuracy,
+								})
+								topPlayedLessonsData.push({
+									lessonName: lessonData.name,
+									lessonTaken: lessonData.lessonTaken,
+								})
+				}
+				})
+						numberLessonsSnapshot.forEach((lessonDoc) => {
+				const lessonData = lessonDoc.data()
+				if (lessonData) {
+					const accuracy =
+					(lessonData.accumulatedScore /
+						(lessonData.lessonTaken * lessonData.total)) *
+					100
+								topLessonsData.push({
+									lessonName: lessonData.name,
+									accuracy: isNaN(accuracy) ? 0 : accuracy,
+								})
+								topPlayedLessonsData.push({
+									lessonName: lessonData.name,
+									lessonTaken: lessonData.lessonTaken,
+								})
+				}
+				})
+						wordLessonsSnapshot.forEach((lessonDoc) => {
+				const lessonData = lessonDoc.data()
+				if (lessonData) {
+					const accuracy =
+					(lessonData.accumulatedScore /
+						(lessonData.lessonTaken * lessonData.total)) *
+					100
+								topLessonsData.push({
+									lessonName: lessonData.name,
+									accuracy: isNaN(accuracy) ? 0 : accuracy,
+								})
+								topPlayedLessonsData.push({
+									lessonName: lessonData.name,
+									lessonTaken: lessonData.lessonTaken,
+								})
+				}
+				})
+						// Add more forEach on new lesson types
 
-        // Sort lessonsData array by accuracy
-        const sortedTopLessons = topLessonsData.sort(
-          (a, b) =>
-            (isTopLessonsListDescending ? b.accuracy - a.accuracy : a.accuracy - b.accuracy)
-        )
-				const sortedTopPlayedLessons = topPlayedLessonsData.sort(
-          (a, b) =>
-            (isTopPlayedLessonsListDescending ? b.lessonTaken - a.lessonTaken : a.lessonTaken - b.lessonTaken)
-        )
+				// Sort lessonsData array by accuracy
+				const sortedTopLessons = topLessonsData.sort(
+				(a, b) =>
+					(isTopLessonsListDescending ? b.accuracy - a.accuracy : a.accuracy - b.accuracy)
+				)
+						const sortedTopPlayedLessons = topPlayedLessonsData.sort(
+				(a, b) =>
+					(isTopPlayedLessonsListDescending ? b.lessonTaken - a.lessonTaken : a.lessonTaken - b.lessonTaken)
+				)
 
-        setTopLessons(sortedTopLessons)
-				setTopPlayedLessons(sortedTopPlayedLessons)
-      } catch (error) {
-        console.error("Error fetching top lessons:", error)
-      }
-    };
+				setTopLessons(sortedTopLessons)
+						setTopPlayedLessons(sortedTopPlayedLessons)
+			} catch (error) {
+				console.error("Error fetching top lessons:", error)
+			}
+    	};
 
 		getUserData()
 		getTopandTopPlayedLessons()

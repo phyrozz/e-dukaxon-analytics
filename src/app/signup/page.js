@@ -19,7 +19,7 @@ function Page() {
 
         // else successful
         console.log(result)
-        return router.push("/admin")
+        return router.push("/admin/home")
     }
     return (<div className="flex w-screen h-screen justify-center items-center relative bg-slate-200">
         <div className="absolute top-5 left-5">

@@ -1,19 +1,22 @@
 'use client'
-import React, { useState } from "react"
-import signIn from "@/firebase/auth/signin"
+import { useState } from "react"
+import signUp from "@/firebase/auth/signup"
 import { useRouter } from 'next/navigation'
 import { db } from "@/firebase/config"
+import firebase from "firebase/compat/app"
 import { Button, CircularProgress, FilledInput, InputAdornment, IconButton, FormControl, InputLabel, FormHelperText } from "@mui/material"
 import { Visibility, VisibilityOff, ArrowForwardRounded, ArrowBackRounded } from "@mui/icons-material"
 
 function Page() {
-    const [email, setEmail] = React.useState('')
-    const [password, setPassword] = React.useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
-    const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false)
     const [isEmailInvalid, setIsEmailInvalid] = useState(false)
     const [isPasswordInvalid, setIsPasswordInvalid] = useState(false)
+    const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -26,35 +29,45 @@ function Page() {
         event.preventDefault();
         setLoading(true);
 
-        // Check if the email exists in the "users" collection
-        const isEmailRegistered = await checkEmailRegistered(email);
+        // Check if the email already exists in the "admins" collection
+        const isAdmin = await checkAdmin(email);
 
-        if (!isEmailRegistered) {
+        if (isAdmin) {
+            // Admin account already exists
             setLoading(false);
             setIsEmailInvalid(true);
-            setErrorMessage("Account does not exist. Please create one on the app.");
-        } else {
-            const { result, error } = await signIn(email, password);
-
+            setIsPasswordInvalid(true);
+            setErrorMessage("Admin account already exists.");
+        } else if (password !== confirmPassword) {
+            // Passwords do not match
             setLoading(false);
-
-            if (error) {
-                console.error(error);
-                setIsPasswordInvalid(true);
-                setErrorMessage("Invalid password. Please try again.");
-            } else {
-                console.log(result);
-                router.push("/home");
+            setIsConfirmPasswordInvalid(true);
+            setErrorMessage("Passwords do not match.");
+        } else {
+            try {
+                // User is not an admin, and passwords match
+                const authResult = await signUp(email, password);
+                const userId = authResult.result.user.uid
+    
+                await db.collection('admins').doc(userId).set({
+                    email: email,
+                    accountCreatedAt: firebase.firestore.Timestamp.now(),
+                });
+    
+                return router.push("/admin/home");
+            } catch (error) {
+                console.error('Error creating admin account:', error);
+                setLoading(false);
+                setErrorMessage('Error creating admin account. Please try again.');
             }
         }
-    };
+    }
 
-    const checkEmailRegistered = async (email) => {
+    const checkAdmin = async (email) => {
         try {
-            const usersSnapshot = await db.collection('users').where('email', '==', email).get();
-            return !usersSnapshot.empty;
+            const adminSnapshot = await db.collection('admins').where('email', '==', email).get();
+            return !adminSnapshot.empty;
         } catch (error) {
-            console.error('Error checking email registration:', error);
             return false;
         }
     };
@@ -66,11 +79,12 @@ function Page() {
         </Button>
     </div>
     <div className="flex flex-col justify-center items-center w-96">
-        <h1 className="text-center text-4xl pb-8">Sign in</h1>
+        <h1 className="text-center text-3xl pb-8">Create an Admin Account</h1>
         <form onSubmit={handleForm} className="form flex flex-col gap-2 w-full">
             <FormControl variant="filled">
                 <InputLabel htmlFor="email">Email</InputLabel>
                 <FilledInput 
+                    error={isEmailInvalid ? true : false}
                     id="email"
                     type="email"
                     onChange={(e) => setEmail(e.target.value)} 
@@ -83,6 +97,7 @@ function Page() {
             <FormControl variant="filled">
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <FilledInput 
+					error={isPasswordInvalid ? true : false}
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     onChange={(e) => setPassword(e.target.value)} 
@@ -104,12 +119,25 @@ function Page() {
                 />
 				{isPasswordInvalid ? <FormHelperText error>Invalid password</FormHelperText> : null}
             </FormControl>
-            <p className="text-red-600 font-bold text-sm text-center">{errorMessage}</p>
+            <FormControl variant="filled">
+                <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
+                <FilledInput 
+					error={isConfirmPasswordInvalid ? true : false}
+                    id="confirm-password"
+                    type={showPassword ? 'text' : 'password'}
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    autoComplete="on"
+                    required
+                    fullWidth
+                />
+            </FormControl>
+			<p className="text-red-600 font-bold text-sm text-center">{errorMessage}</p>
             <div className="flex justify-end items-center mt-4">
                 <Button type="submit" variant="outlined" color="primary" disabled={loading ? true : false}>{loading ? <CircularProgress size={20} /> : <ArrowForwardRounded />}</Button>
             </div>
         </form>
     </div>
+	
 </div>);
 }
 

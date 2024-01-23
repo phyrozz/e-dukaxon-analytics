@@ -12,9 +12,9 @@ function Page() {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false)
-		const [isEmailInvalid, setIsEmailInvalid] = useState(false)
-		const [isPasswordInvalid, setIsPasswordInvalid] = useState(false)
-		const [errorMessage, setErrorMessage] = useState("")
+	const [isEmailInvalid, setIsEmailInvalid] = useState(false)
+	const [isPasswordInvalid, setIsPasswordInvalid] = useState(false)
+	const [errorMessage, setErrorMessage] = useState("")
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -32,7 +32,7 @@ function Page() {
 			if (isAdmin) {
 				await signIn(email, password)
 				setLoading(false)
-				return router.push("/admin");
+				return router.push("/admin/home");
 			} else {
 				// User is not an admin
 				setLoading(false)
@@ -54,7 +54,7 @@ function Page() {
 
     return (<div className="flex w-screen h-screen justify-center items-center relative bg-slate-200">
     <div className="absolute top-5 left-5">
-        <Button onClick={() => router.push('/')}>
+        <Button onClick={() => router.back()}>
             <ArrowBackRounded /> Back
         </Button>
     </div>
@@ -64,20 +64,20 @@ function Page() {
             <FormControl variant="filled">
                 <InputLabel htmlFor="email">Email</InputLabel>
                 <FilledInput 
-									error={isEmailInvalid ? true : false}
-									id="email"
-									type="email"
-									onChange={(e) => setEmail(e.target.value)} 
-									autoComplete="on"
-									required
-									fullWidth
+					error={isEmailInvalid ? true : false}
+					id="email"
+					type="email"
+					onChange={(e) => setEmail(e.target.value)} 
+					autoComplete="on"
+					required
+					fullWidth
                 />
-								{isEmailInvalid ? <FormHelperText error>Invalid email</FormHelperText> : null}
+				{isEmailInvalid ? <FormHelperText error>Invalid email</FormHelperText> : null}
             </FormControl>
             <FormControl variant="filled">
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <FilledInput 
-										error={isPasswordInvalid ? true : false}
+					error={isPasswordInvalid ? true : false}
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     onChange={(e) => setPassword(e.target.value)} 
@@ -97,14 +97,20 @@ function Page() {
                     required
                     fullWidth
                 />
-								{isPasswordInvalid ? <FormHelperText error>Invalid password</FormHelperText> : null}
+				{isPasswordInvalid ? <FormHelperText error>Invalid password</FormHelperText> : null}
             </FormControl>
-						<p className="text-red-600 font-bold text-sm text-center">{errorMessage}</p>
+				<p className="text-red-600 font-bold text-sm text-center">{errorMessage}</p>
             <div className="flex justify-end items-center mt-4">
                 <Button type="submit" variant="outlined" color="primary" disabled={loading ? true : false}>{loading ? <CircularProgress size={20} /> : <ArrowForwardRounded />}</Button>
             </div>
         </form>
+		<div>
+			<Button onClick={() => router.push("../signup/admin")}>
+				Create an account
+			</Button>
+		</div>
     </div>
+	
 </div>);
 }
 

@@ -13,7 +13,7 @@ function Page() {
 	const router = useRouter()
 
 	React.useEffect(() => {
-		if (user == null) router.push("/")
+		if (user == null || user.role === "admin") router.push("/")
 
 		const getUserData = async () => {
 			try {
