@@ -114,94 +114,35 @@ function Page() {
     };
 
     const getTopPlayedGames = async () => {
-			try {
-				const letterGuessSnapshot = await db
-        .collection("letterGuess")
-				.doc(isEnglish ? "en" : "ph")
-				.collection("lessons")
-				.get();
-        const letterTracingSnapshot = await db
-        .collection("letterTracing")
-				.doc(isEnglish ? "en" : "ph")
-				.collection("lessons")
-				.get();
-        const soundQuizSnapshot = await db
-        .collection("soundQuiz")
-				.doc(isEnglish ? "en" : "ph")
-				.collection("lessons")
-				.get();
-        const storyBuildingSnapshot = await db
-        .collection("storyBuilding")
-				.doc(isEnglish ? "en" : "ph")
-				.collection("lessons")
-				.get();
-        const wordPlaceSnapshot = await db
-        .collection("wordPlace")
-				.doc(isEnglish ? "en" : "ph")
-				.collection("lessons")
-				.get();
-        // Add more snapshots on new games
+      try {
+        const gamesCollection = await db.collection("games").get();
+        const topPlayedGamesData = [];
+    
+        gamesCollection.forEach((gameDoc) => {
+          const gameData = gameDoc.data();
+          if (gameData) {
+            topPlayedGamesData.push({
+              gameName: gameData.name,
+              gameCounter: gameData.counter ?? 0,
+            });
+          }
+        });
+    
+        // Sort gamesData array by counter
+        const sortedTopPlayedGames = topPlayedGamesData.sort((a, b) =>
+          isTopPlayedGamesListDescending
+            ? b.gameCounter - a.gameCounter
+            : a.gameCounter - b.gameCounter
+        );
+    
+        setTopPlayedGames(sortedTopPlayedGames);
 
-				const topPlayedGamesData = []
-
-				letterGuessSnapshot.forEach((gameDoc) => {
-          const gameData = gameDoc.data()
-          if (gameData) {
-            topPlayedGamesData.push({
-              gameName: gameData.name,
-              gameCounter: gameData.counter ?? 0,
-            })
-          }
-				})
-        letterTracingSnapshot.forEach((gameDoc) => {
-          const gameData = gameDoc.data()
-          if (gameData) {
-            topPlayedGamesData.push({
-              gameName: gameData.name,
-              gameCounter: gameData.counter ?? 0,
-            })
-          }
-				})
-        soundQuizSnapshot.forEach((gameDoc) => {
-          const gameData = gameDoc.data()
-          if (gameData) {
-            topPlayedGamesData.push({
-              gameName: gameData.name,
-              gameCounter: gameData.counter ?? 0,
-            })
-          }
-				})
-        storyBuildingSnapshot.forEach((gameDoc) => {
-          const gameData = gameDoc.data()
-          if (gameData) {
-            topPlayedGamesData.push({
-              gameName: gameData.name,
-              gameCounter: gameData.counter ?? 0,
-            })
-          }
-				})
-        wordPlaceSnapshot.forEach((gameDoc) => {
-          const gameData = gameDoc.data()
-          if (gameData) {
-            topPlayedGamesData.push({
-              gameName: gameData.name,
-              gameCounter: gameData.counter ?? 0,
-            })
-          }
-				})
-				// Add more forEach on new games
-
-				// Sort lessonsData array by counter
-				const sortedTopPlayedGames = topPlayedGamesData.sort(
-          (a, b) =>
-            (isTopPlayedGamesListDescending ? b.gameCounter - a.gameCounter : a.gameCounter - b.gameCounter)
-				)
-
-				setTopPlayedGames(sortedTopPlayedGames)
-			} catch (error) {
-				console.error("Error fetching top games:", error)
-			}
+        console.log(sortedTopPlayedGames)
+      } catch (error) {
+        console.error("Error fetching top games:", error);
+      }
     };
+    
 
     getUserData()
 		getTopPlayedLessons()
@@ -307,7 +248,7 @@ function Page() {
                   data={{
                     labels: topPlayedGames.slice(0, 10).map((game, index) => game.gameName),
                     datasets: [{
-                      data: topPlayedGames.slice(0, 10).map((game) => game.gameTaken),
+                      data: topPlayedGames.slice(0, 10).map((game) => game.gameCounter),
                         label: "Times played",
                         backgroundColor: "#334155",
                         borderRadius: 5,
