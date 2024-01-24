@@ -51,9 +51,9 @@ function Page() {
 				const doc = await db.collection('users').doc(userId).get()
 
 				if (doc.exists) {
-				const userData = doc.data()
-				setEmail(userData?.email || '')
-							setIsParent(userData?.isParent || false)
+          const userData = doc.data()
+          setEmail(userData?.email || '')
+          setIsParent(userData?.isParent || false)
 				}
 			} catch (error) {
 				console.error('Error fetching user data:', error)
