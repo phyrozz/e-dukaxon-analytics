@@ -3,6 +3,27 @@ import './globals.css'
 import { AuthContextProvider } from '@/context/AuthContext'
 import ProgressBarProvider from '@/context/ProgressBarContext'
 import { createTheme, ThemeProvider } from '@mui/material'
+import localFont from "next/font/local"
+
+const openDyslexic = localFont({
+  src: [
+    {
+      path: './OpenDyslexic-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './OpenDyslexic-Italic.otf',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: './OpenDyslexic-Bold.otf',
+      weight: '700',
+      style: 'bold',
+    },
+  ],
+})
 
 const { palette } = createTheme()
 const { augmentColor } = palette
@@ -18,7 +39,7 @@ const theme = createTheme({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={openDyslexic.className}>
       {/*
         <head /> will contain the components returned by the nearest parent
         head.js. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head

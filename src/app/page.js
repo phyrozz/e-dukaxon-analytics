@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="grid grid-cols-12 gap-0">
-      <div className="col-span-8 md:block hidden overflow-hidden" style={{ position: 'relative' }}>
+      <div className="col-span-8 md:block hidden overflow-hidden bg-slate-900" style={{ position: 'relative' }}>
         <Image
           src="/bg.jpg"
           alt="Background Image"
