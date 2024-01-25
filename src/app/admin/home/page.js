@@ -171,7 +171,7 @@ function Page() {
                 endIcon={isEnglish ? <Image alt="United States" src={"http://purecatamphetamine.github.io/country-flag-icons/1x1/US.svg"} width="22" height="22"/> 
                 : <Image alt="Philippines" src={"http://purecatamphetamine.github.io/country-flag-icons/1x1/PH.svg"} width="22" height="22"/>}
               >
-                {isEnglish ? "English" : "Filipino"}
+                Lesson Category: 
               </Button>
               <Menu
                 id="locale-select-menu"
