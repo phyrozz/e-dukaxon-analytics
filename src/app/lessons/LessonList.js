@@ -18,12 +18,15 @@ export default function LessonList(props) {
         const lessonData = snapshot.docs.map((doc) => {
           const data = doc.data();
           return {
-						id: data.id || 0,
-						name: data.name || "",
+            id: data.id || 0,
+            name: data.name || "",
             progress: data.progress || 0,
-						isUnlocked: data.isUnlocked || false,
+            isUnlocked: data.isUnlocked || false,
           };
         });
+
+        // Sort lessons by id in ascending order
+        lessonData.sort((a, b) => a.id - b.id);
 
         setLessons(lessonData);
       } catch (error) {
@@ -48,7 +51,7 @@ export default function LessonList(props) {
       <AccordionDetails>
         <Grid container spacing={2} justifyContent="center">
           {lessons.map((lesson) => (
-            <Grid item>
+            <Grid item key={lesson.id}>
 							<div className={`rounded-md ${lesson.isUnlocked ? 'bg-gradient-to-r from-slate-600 to-slate-500' : 'bg-gray-400'} shadow-xl flex flex-col justify-start w-48 h-48 p-5`}>
 								<h1 className="text-3xl text-slate-50">{lesson.name}</h1>
 								<p className="text-md text-slate-50">
