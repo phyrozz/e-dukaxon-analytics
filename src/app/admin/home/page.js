@@ -151,15 +151,26 @@ function Page() {
 
     const getTopCompletedLessons = async () => {
       try {
-        const lessonsSnapshot = await db
+        const letterLessonsSnapshot = await db
           .collection("letters")
           .doc(isEnglish ? "en" : "ph")
           .collection("lessons")
           .get();
+        const numberLessonsSnapshot = await db
+          .collection("numbers")
+          .doc(isEnglish ? "en" : "ph")
+          .collection("lessons")
+          .get();
+        const wordLessonsSnapshot = await db
+          .collection("words")
+          .doc(isEnglish ? "en" : "ph")
+          .collection("lessons")
+          .get();
+        // Add more snapshots on new lesson types
     
         const topHighestCompletionRateLessonsData = [];
     
-        lessonsSnapshot.forEach((lessonDoc) => {
+        letterLessonsSnapshot.forEach((lessonDoc) => {
           const lessonData = lessonDoc.data();
     
           if (lessonData) {
@@ -167,7 +178,7 @@ function Page() {
             const startCounter = lessonData.startCounter ?? 0;
     
             // Calculate completion rate (percentage)
-            const completionRate = startCounter !== 0 ? (startCounter / lessonCounter) * 100 : 0;
+            const completionRate = startCounter !== 0 ? (lessonCounter / startCounter) * 100 : 0;
     
             topHighestCompletionRateLessonsData.push({
               lessonName: lessonData.name,
@@ -175,6 +186,39 @@ function Page() {
             });
           }
         });
+        numberLessonsSnapshot.forEach((lessonDoc) => {
+          const lessonData = lessonDoc.data();
+    
+          if (lessonData) {
+            const lessonCounter = lessonData.counter ?? 0;
+            const startCounter = lessonData.startCounter ?? 0;
+    
+            // Calculate completion rate (percentage)
+            const completionRate = startCounter !== 0 ? (lessonCounter / startCounter) * 100 : 0;
+    
+            topHighestCompletionRateLessonsData.push({
+              lessonName: lessonData.name,
+              completionRate,
+            });
+          }
+        });
+        wordLessonsSnapshot.forEach((lessonDoc) => {
+          const lessonData = lessonDoc.data();
+    
+          if (lessonData) {
+            const lessonCounter = lessonData.counter ?? 0;
+            const startCounter = lessonData.startCounter ?? 0;
+    
+            // Calculate completion rate (percentage)
+            const completionRate = startCounter !== 0 ? (lessonCounter / startCounter) * 100 : 0;
+    
+            topHighestCompletionRateLessonsData.push({
+              lessonName: lessonData.name,
+              completionRate,
+            });
+          }
+        });
+        // Add more forEach loops on new lesson types
     
         // Sort lessonsData array by completion rate
         const sortedTopHighestCompletionRateLessons = topHighestCompletionRateLessonsData.sort(
