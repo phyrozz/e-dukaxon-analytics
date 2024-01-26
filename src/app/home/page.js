@@ -244,6 +244,7 @@ function Page() {
 							<LessonProgressCard name="Letters" progress={letterProgress} />
 							<LessonProgressCard name="Numbers" progress={numberProgress} />
 							<LessonProgressCard name="Words" progress={wordProgress} />
+							<LessonProgressCard name="Sentences" progress={0} />
 						</div>
 					</div>
 					<div className="grid lg:grid-cols-2 grid-cols-1">

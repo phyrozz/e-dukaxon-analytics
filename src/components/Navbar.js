@@ -60,22 +60,10 @@ const Navbar = (props) => {
             <h2 className="text-md">{email}</h2>
           </div>
           <Divider />
-          <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
           <MenuItem onClick={handleLogOut}>Log out</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
-
-    // Old navbar layout
-    // <nav>
-    //   <div className="sticky top-0 bg-slate-700 text-slate-50 flex justify-between items-center">
-    //     <div>
-    //         <Link className='hover:bg-slate-800 px-6 py-2 rounded-md transition' href="/admin">Dashboard</Link>
-    //         <Link className='hover:bg-slate-800 px-6 py-2 rounded-md transition' href="/lessons">Lessons</Link>
-    //     </div>
-    //     <button className='hover:bg-slate-800 px-6 py-2 rounded-md transition justify-end' onClick={handleLogOut}>Log Out</button>
-    //   </div>
-    // </nav>
   );
 };
 
