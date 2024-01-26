@@ -34,7 +34,7 @@ export default function LessonList(props) {
     const userId = auth.currentUser.uid;
 
     fetchLessons();
-  }, [locale]);
+  }, [locale, lessonType]);
 
   return (
     <Accordion defaultExpanded>
